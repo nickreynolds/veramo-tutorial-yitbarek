@@ -37,7 +37,7 @@ import { getResolver as peerDidResolver } from 'peer-did-resolver'
 // TypeORM is installed with '@veramo/data-store'
 import { DataSource } from 'typeorm'
 
-import { ICredentialIssuerLD,CredentialPlugin, ICredentialIssuer, ICredentialVerifier } from '@veramo/credential-w3c'
+import { CredentialPlugin, ICredentialIssuer, ICredentialVerifier } from '@veramo/credential-w3c'
 
 import { DIDComm, DIDCommHttpTransport, DIDCommMessageHandler, IDIDComm ,   PickupRecipientMessageHandler, CoordinateMediationRecipientMessageHandler} from  '@veramo/did-comm'
 
@@ -115,7 +115,7 @@ export const agent = createAgent<
       defaultProvider: 'did:peer',
       providers: {
 
-        'did:peer': new PeerDIDProvider({defaultKms:'local',type:'X25519'}),
+        'did:peer': new PeerDIDProvider({defaultKms:'local'}),
 
       },
     }),
