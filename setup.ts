@@ -50,7 +50,7 @@ import { IDIDCommMessage } from '@veramo/did-comm'
 
 // CONSTANTS
 // You will need to get a project ID from infura https://www.infura.io
-const INFURA_PROJECT_ID = ''
+const INFURA_PROJECT_ID = '3586660d179141e3801c3895de1c2eba'
 
 // This is a raw X25519 private key, provided as an example.
 // You can run `npx @veramo/cli config create-secret-key` in a terminal to generate a new key.
@@ -77,38 +77,7 @@ let dbConnection = new DataSource({
 // ... imports & CONSTANTS & DB setup
 
 // Veramo agent setup
-export const agent2 = createAgent<IDIDManager & IKeyManager & IDataStore & IDataStoreORM>({
-  plugins: [
-    new KeyManager({
-      store: new KeyStore(dbConnection),
-      kms: {
-        local: new KeyManagementSystem(new PrivateKeyStore(dbConnection, new SecretBox(DB_ENCRYPTION_KEY))),
-      },
-    }),
-    new DIDManager({
-      store: new DIDStore(dbConnection),
-      defaultProvider: 'did:ethr:goerli',
-      providers: {
-        'did:ethr:goerli': new EthrDIDProvider({
-          defaultKms: 'local',
-          network: 'goerli',
-          name: 'goerli',
-          rpcUrl: 'https://goerli.infura.io/v3/' + INFURA_PROJECT_ID,
-          gas: 1000001,
-          ttl: 31104001,
-        }),
 
-      },
-    }),
-    new DIDResolverPlugin({
-        ...ethrDidResolver({ infuraProjectId: INFURA_PROJECT_ID }), // and set it up to support `did:ethr`
-        ...webDidResolver(), // and `did:web`
-      }),
-
-
-
-  ],
-})
 
 
 export const agent = createAgent<
@@ -143,6 +112,18 @@ export const agent = createAgent<
         ...peerDidResolver(), // and `did:peer`
 
       }),
+
+      new MessageHandler({
+        messageHandlers: [
+          new DIDCommMessageHandler(),
+          new SaveMessageHandler(),
+          new CoordinateMediationRecipientMessageHandler(),
+          new PickupRecipientMessageHandler(),
+          new JwtMessageHandler(),
+          new W3cMessageHandler(),
+          new SdrMessageHandler(),
+        ],
+      })
 
 
       
