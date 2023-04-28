@@ -14,7 +14,7 @@ import { SafeAreaView, ScrollView, View, Text, Button } from 'react-native'
 // Import the agent from our earlier setup
 import { agent } from './setup'
 // import some data types:
-import { DIDResolutionResult, IIdentifier } from '@veramo/core'
+import { DIDResolutionResult, IIdentifier, VerifiableCredential, VerifiablePresentation } from '@veramo/core'
 
 import { IVerifyResult } from '@veramo/core'
 
@@ -71,14 +71,14 @@ const App = () => {
   // Add the new identifier to state
   const createIdentifier = async () => {
     const _id = await agent.didManagerCreate({
-      alias: 'alice',
+      // alias: 'alice',
       provider: 'did:peer',
       options: {
         num_algo: 2,
         service: {
           id: '1234',
           type: 'DIDCommMessaging',
-          serviceEndpoint: 'did:peer:dev-didcomm-mediator.herokuapp.com',
+          serviceEndpoint: 'did:web:dev-didcomm-mediator.herokuapp.com',
           description: 'a DIDComm endpoint',
         },
       },
@@ -172,7 +172,7 @@ const App = () => {
     const message = {
       type: 'test',
       to: identifiers[identifiers.length-1].did,
-      from: identifiers[identifiers.length-2],
+      from: identifiers[identifiers.length-2].did,
       id: '1250',
       body: { hello: 'world het' },
     }
@@ -191,10 +191,9 @@ const App = () => {
   const receivedMessage =async () => {
     
 
-    const statusMessage = await createStatusRequestMessage({
-      mediatorDidUrl:'did:web:dev-didcomm-mediator.herokuapp.com',
-      recipientDidUrl: identifiers[identifiers.length-1].did,
-    })
+    const statusMessage = await createStatusRequestMessage(
+      identifiers[identifiers.length-1].did,
+      'did:web:dev-didcomm-mediator.herokuapp.com')
     
     const packedStatusMessage = await agent.packDIDCommMessage({
       packing: 'none',
@@ -207,10 +206,9 @@ const App = () => {
       recipientDidUrl: 'did:web:dev-didcomm-mediator.herokuapp.com',
     })
 
-    const deliveryMessage = await deliveryRequestMessage({
-      recipientDidUrl: identifiers[identifiers.length-1].did,
-      mediatorDidUrl: 'did:web:dev-didcomm-mediator.herokuapp.com',
-  })
+    const deliveryMessage = await deliveryRequestMessage(
+      identifiers[identifiers.length-1].did,
+      'did:web:dev-didcomm-mediator.herokuapp.com')
 
   const packedDeliveryMessage = await agent.packDIDCommMessage({
     packing: 'none',
@@ -229,15 +227,15 @@ const App = () => {
   const getMessage =async () => {
     
 
-    const messages = await agent.dataStoreGetMessage({
+    const messages = await agent.dataStoreORMGetMessage({
       where: [{ column: 'type', value: ['veramo.io-chat-v1'] }],
       order: [{ column: 'createdAt', direction: 'DESC' }],
     })
     
 
 
-  console.log(message)
-    //console.log(packedStatusMessage)
+    console.log(messages) 
+    //console.log(packedStatusMessag  e)
   }
 
   return (
