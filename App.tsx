@@ -222,7 +222,21 @@ const App = () => {
     recipientDidUrl: 'did:web:dev-didcomm-mediator.herokuapp.com',
   })
 
-    console.log(result)
+  console.log(result)
+    //console.log(packedStatusMessage)
+  }
+
+  const getMessage =async () => {
+    
+
+    const messages = await agent.dataStoreGetMessage({
+      where: [{ column: 'type', value: ['veramo.io-chat-v1'] }],
+      order: [{ column: 'createdAt', direction: 'DESC' }],
+    })
+    
+
+
+  console.log(message)
     //console.log(packedStatusMessage)
   }
 
@@ -296,7 +310,9 @@ const App = () => {
           <Button title={'Recieved Message'} onPress={() => receivedMessage()}  />
         </View>
 
-
+        <View style={{ padding: 20 }}>
+          <Button title={'Get Message'} onPress={() => getMessage()}  />
+        </View>
 
       </ScrollView>
     </SafeAreaView>
