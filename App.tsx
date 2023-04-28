@@ -39,6 +39,7 @@ const App = () => {
 
   const DELIVERY_REQUEST_MESSAGE_TYPE =
   'https://didcomm.org/messagepickup/3.0/delivery-request'
+  const MEDIATE_REQUEST_MESSAGE_TYPE = 'https://didcomm.org/coordinate-mediation/2.0/mediate-request'
 
   function createStatusRequestMessage(
     recipientDidUrl: string,
@@ -68,6 +69,23 @@ const App = () => {
     }
   }
 
+  function createMediateRequestMessage(
+    recipientDidUrl: string,
+    mediatorDidUrl: string,
+  ): IDIDCommMessage {
+    return {
+      type: MEDIATE_REQUEST_MESSAGE_TYPE,
+      from: recipientDidUrl,
+      to: mediatorDidUrl,
+      id: v4(),
+      return_route: 'all',
+      created_time: (new Date()).toISOString(),
+      body: {},
+    }
+  }
+
+  const mediatorDID = 'did:web:dev-didcomm-mediator.herokuapp.com'
+
   // Add the new identifier to state
   const createIdentifier = async () => {
     const _id = await agent.didManagerCreate({
@@ -78,11 +96,14 @@ const App = () => {
         service: {
           id: '1234',
           type: 'DIDCommMessaging',
-          serviceEndpoint: 'did:web:dev-didcomm-mediator.herokuapp.com',
+          serviceEndpoint: mediatorDID,
           description: 'a DIDComm endpoint',
         },
       },
     })
+
+    const requestMediationMessage = createMediateRequestMessage(_id.did, mediatorDID)
+
     setIdentifiers((s) => s.concat([_id]))
   }
 
@@ -193,32 +214,33 @@ const App = () => {
 
     const statusMessage = await createStatusRequestMessage(
       identifiers[identifiers.length-1].did,
-      'did:web:dev-didcomm-mediator.herokuapp.com')
+      mediatorDID)
     
     const packedStatusMessage = await agent.packDIDCommMessage({
       packing: 'none',
       message: statusMessage,
     })
 
-    const result1=await agent.sendDIDCommMessage({
+    const result1= await agent.sendDIDCommMessage({
       messageId: statusMessage.id,
       packedMessage: packedStatusMessage,
-      recipientDidUrl: 'did:web:dev-didcomm-mediator.herokuapp.com',
+      recipientDidUrl: mediatorDID,
     })
+    console.log("result1: ", result1)
 
     const deliveryMessage = await deliveryRequestMessage(
       identifiers[identifiers.length-1].did,
       'did:web:dev-didcomm-mediator.herokuapp.com')
 
-  const packedDeliveryMessage = await agent.packDIDCommMessage({
-    packing: 'none',
-    message: deliveryMessage,
-  })
-  const result=await agent.sendDIDCommMessage({
-    messageId: deliveryMessage.id,
-    packedMessage: packedDeliveryMessage,
-    recipientDidUrl: 'did:web:dev-didcomm-mediator.herokuapp.com',
-  })
+    const packedDeliveryMessage = await agent.packDIDCommMessage({
+      packing: 'none',
+      message: deliveryMessage,
+    })
+    const result=await agent.sendDIDCommMessage({
+      messageId: deliveryMessage.id,
+      packedMessage: packedDeliveryMessage,
+      recipientDidUrl: 'did:web:dev-didcomm-mediator.herokuapp.com',
+    })
 
   console.log(result)
     //console.log(packedStatusMessage)
