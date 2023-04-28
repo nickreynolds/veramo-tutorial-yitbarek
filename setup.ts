@@ -43,7 +43,20 @@ import { DIDComm, DIDCommHttpTransport, DIDCommMessageHandler, IDIDComm ,   Pick
 
 import { IDIDCommMessage } from '@veramo/did-comm'
 
+import { SaveMessageHandler } from './saveMessageHandler'
 
+import { MessageHandler } from '@veramo/message-handler'
+
+/*
+import {
+  IAgentOptions,
+  IDIDManager,
+  IEventListener,
+  IKeyManager,
+  IResolver,
+  TAgent,
+} from '@veramo/core-types'
+*/
 // filename: setup.ts
 
 // ... imports
@@ -119,9 +132,9 @@ export const agent = createAgent<
           new SaveMessageHandler(),
           new CoordinateMediationRecipientMessageHandler(),
           new PickupRecipientMessageHandler(),
-          new JwtMessageHandler(),
-          new W3cMessageHandler(),
-          new SdrMessageHandler(),
+          //new JwtMessageHandler(),
+          //new W3cMessageHandler(),
+          //new SdrMessageHandler(),
         ],
       })
 
