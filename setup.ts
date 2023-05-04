@@ -114,18 +114,14 @@ export const agent = createAgent<
       store: new DIDStore(dbConnection),
       defaultProvider: 'did:peer',
       providers: {
-
         'did:peer': new PeerDIDProvider({defaultKms:'local'}),
-
       },
     }),
     new DIDResolverPlugin({
         ...ethrDidResolver({ infuraProjectId: INFURA_PROJECT_ID }), // and set it up to support `did:ethr`
         ...webDidResolver(), // and `did:web`
         ...peerDidResolver(), // and `did:peer`
-
       }),
-
       new MessageHandler({
         messageHandlers: [
           new DIDCommMessageHandler(),

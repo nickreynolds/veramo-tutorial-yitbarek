@@ -194,15 +194,15 @@ const App = () => {
       type: 'test',
       to: identifiers[identifiers.length-1].did,
       from: identifiers[identifiers.length-2].did,
-      id: '1250',
+      id: v4(),
       body: { hello: 'world het' },
     }
     const packedMessage = await agent.packDIDCommMessage({
-      packing: 'none',
+      packing: 'authcrypt',
       message,
     })
     const result = await agent.sendDIDCommMessage({
-      messageId: '1250',
+      messageId: message.id,
       packedMessage,
       recipientDidUrl: identifiers[identifiers.length-1].did,
     })
@@ -217,7 +217,7 @@ const App = () => {
       mediatorDID)
     
     const packedStatusMessage = await agent.packDIDCommMessage({
-      packing: 'none',
+      packing: 'authcrypt',
       message: statusMessage,
     })
 
@@ -233,7 +233,7 @@ const App = () => {
       'did:web:dev-didcomm-mediator.herokuapp.com')
 
     const packedDeliveryMessage = await agent.packDIDCommMessage({
-      packing: 'none',
+      packing: 'authcrypt',
       message: deliveryMessage,
     })
     const result=await agent.sendDIDCommMessage({
