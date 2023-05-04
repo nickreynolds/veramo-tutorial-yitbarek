@@ -101,8 +101,21 @@ const App = () => {
         },
       },
     })
+    console.log("_id: ", _id)
+    const d = await agent.didManagerGet({ did: _id.did })
+    console.log("d:", d)
 
     const requestMediationMessage = createMediateRequestMessage(_id.did, mediatorDID)
+    const packedMediationRequestMessage = await agent.packDIDCommMessage({
+      packing: 'authcrypt',
+      message: requestMediationMessage
+    })
+    const sent = await agent.sendDIDCommMessage({
+      messageId: requestMediationMessage.id,
+      packedMessage: packedMediationRequestMessage,
+      recipientDidUrl: mediatorDID,
+    })
+    console.log("sent: ", sent)
 
     setIdentifiers((s) => s.concat([_id]))
   }
