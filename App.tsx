@@ -101,8 +101,21 @@ const App = () => {
         },
       },
     })
+    console.log("_id: ", _id)
+    const d = await agent.didManagerGet({ did: _id.did })
+    console.log("d:", d)
 
     const requestMediationMessage = createMediateRequestMessage(_id.did, mediatorDID)
+    const packedMediationRequestMessage = await agent.packDIDCommMessage({
+      packing: 'authcrypt',
+      message: requestMediationMessage
+    })
+    const sent = await agent.sendDIDCommMessage({
+      messageId: requestMediationMessage.id,
+      packedMessage: packedMediationRequestMessage,
+      recipientDidUrl: mediatorDID,
+    })
+    console.log("sent: ", sent)
 
     setIdentifiers((s) => s.concat([_id]))
   }
@@ -194,15 +207,15 @@ const App = () => {
       type: 'test',
       to: identifiers[identifiers.length-1].did,
       from: identifiers[identifiers.length-2].did,
-      id: '1250',
+      id: v4(),
       body: { hello: 'world het' },
     }
     const packedMessage = await agent.packDIDCommMessage({
-      packing: 'none',
+      packing: 'authcrypt',
       message,
     })
     const result = await agent.sendDIDCommMessage({
-      messageId: '1250',
+      messageId: message.id,
       packedMessage,
       recipientDidUrl: identifiers[identifiers.length-1].did,
     })
@@ -217,7 +230,7 @@ const App = () => {
       mediatorDID)
     
     const packedStatusMessage = await agent.packDIDCommMessage({
-      packing: 'none',
+      packing: 'authcrypt',
       message: statusMessage,
     })
 
@@ -233,7 +246,7 @@ const App = () => {
       'did:web:dev-didcomm-mediator.herokuapp.com')
 
     const packedDeliveryMessage = await agent.packDIDCommMessage({
-      packing: 'none',
+      packing: 'authcrypt',
       message: deliveryMessage,
     })
     const result=await agent.sendDIDCommMessage({
